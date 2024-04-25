@@ -15,6 +15,8 @@ const int echoPin4 = 9; // Eco (Echo) para el tercer sensor
 const int SLL = 12; // Sensor de Linea izquierdo
 const int SLR = 11; // Sensor de Linea derecho
 
+const int INIT = 13; 
+
 #define PWML 10  // Potencia del motor izquierdo (valores entre 0-255)
 #define LDIR 5  // Direccionamiento del motor izquierdo 
 #define PWMR 4   // Potencia del motor derecho (valores entre 0-255)
@@ -40,6 +42,8 @@ void setup() {
   pinMode(PWMR, OUTPUT);
   pinMode(LDIR, OUTPUT);
   pinMode(RDIR, OUTPUT);
+
+  pinMode(INIT, INPUT);
 }
 
 void loop() {
@@ -151,10 +155,12 @@ void printing(int d1, int d2, int d3, int d4){
   Serial.println("]");
   }
 
-// Función para controlar cada motor: Recibe el valor del pwm y del dir.
+// Función para controlar cada motor: Recibe el valor del 'pwm' y del 'dir'.
+// pwm es un valor de potencia del motor entre 0 y 255
+// dir es la dirección de giro del motor, ir hacía adelante es 1 y ir hacía atrás es 0
 // Con la variable 'motor' identificamos si es el motor derecho (motor=1) o izquierdo (motor=0) 
 
-void driverMotor(int pwm, int dir, int motor){
+void driveMotor(int motor, int pwm, int dir){
   if (motor){    //motor=1, es decir motor derecho
     analogWrite(PWMR, pwm);
     digitalWrite(RDIR, dir);
@@ -164,3 +170,38 @@ void driverMotor(int pwm, int dir, int motor){
   }
 }
 
+void avanzar(int pwm){
+  pwm = pwm>=255? 255:pwm; // Si de casualidad el valor se excede, se corrige
+  driveMotor(PWML,pwm,1); // El motor izquierdo va hacía adelante con una potencia de pwm
+  driveMotor(PWMR,pwm,1); // El motor derecho  va hacía adelante con una potencia de pwm
+}
+
+void retroceder(int pwm){
+  pwm = pwm>=255? 255:pwm; 
+  driveMotor(PWML,pwm,0); 
+  driveMotor(PWMR,pwm,0); 
+}
+
+// Gira pero es necesario saber qué pwms toma cada valor, yendo siempre hacía adelante ambos.
+// Así, es posible girar a la derecha (pwml>pwmr) o a izquierda (pwml<pwmr)
+void girar(int pwml, int pwmr){
+  pwml = pwml>=255? 255:pwml;
+  pwmr = pwmr>=255? 255:pwmr; 
+  driveMotor(PWML,pwml,1);
+  driveMotor(PWMR,pwmr,1);
+}
+
+// Se gira el robot de manera brusca, por lo tanto, una llanta va hacía el frente y la otra hacía atrás.
+// De nuevo, es necesario cada pwm para cada uno.
+// Si direccion = 1 el robot se voltea hacía la derecha, si es 0 hacía la izquierda 
+void voltear(int direccion, int pwml, int pwmr){
+  pwml = pwml>=255? 255:pwml;
+  pwmr = pwmr>=255? 255:pwmr;  
+  if (direccion){ // si direccion = 1, entonces el motor izquierdo va hacia adelante y el derecho hacía atrás
+    driveMotor(PWML,pwml,1);
+    driveMotor(PWMR,pwmr,0);
+  }else{     // si direccion = 0, entonces el motor izquierdo va hacia adelante y el derecho hacía atrás
+    driveMotor(PWML,pwml,0);
+    driveMotor(PWMR,pwmr,1);
+  }
+}
