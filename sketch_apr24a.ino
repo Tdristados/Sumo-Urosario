@@ -6,26 +6,40 @@
    - GND: GND
 */
 
-const int trigPin1 = 2; // Disparador (Trigger) para el primer sensor
-const int echoPin1 = 6; // Eco (Echo) para el primer sensor
-const int echoPin2 = 7; // Eco (Echo) para el segundo sensor
-const int echoPin3 = 8; // Eco (Echo) para el tercer sensor
-const int echoPin4 = 9; // Eco (Echo) para el tercer sensor
+#define trigPin1 2; // Disparador (Trigger) para el primer sensor
+#define echoPin1 6; // Eco (Echo) para el primer sensor
+#define echoPin2 7; // Eco (Echo) para el segundo sensor
+#define echoPin3 8; // Eco (Echo) para el tercer sensor
+#define echoPin4 9; // Eco (Echo) para el tercer sensor
 
-#define PWMA 12
-#define AIN2 11
-#define AIN1 10
-#define PWMB 5
-#define BIN2 4
-#define BIN1 3
+#define SLL 12; // Sensor de Linea izquierdo
+#define SLD 11; // Sensor de Linea derecho
+
+#define PWML 10  // Potencia del motor izquierdo (valores entre 0-255)
+#define LDIR 5  // Direccionamiento del motor izquierdo 
+#define PWMR 4   // Potencia del motor derecho (valores entre 0-255)
+#define RDIR 3   // Direccionamiento del motor derecho
+
+// Supondremos que el Pin de direccionamieno en 1 hará que el motor
+// vaya en sentido horario
+
 
 void setup() {
   Serial.begin(9600); // Inicia el puerto serial
+
   pinMode(trigPin1, OUTPUT);
   pinMode(echoPin1, INPUT);
   pinMode(echoPin2, INPUT);
   pinMode(echoPin3, INPUT);
   pinMode(echoPin4, INPUT);
+
+  pinMode(SLL, OUTPUT);
+  pinMode(SLR, OUTPUT);
+
+  pinMode(PWML, OUTPUT);
+  pinMode(PWMR, OUTPUT);
+  pinMode(LDIR, OUTPUT);
+  pinMode(RDIR, OUTPUT);
 }
 
 void loop() {
@@ -34,18 +48,6 @@ void loop() {
   int d2 = getDistance(trigPin1, echoPin2);
   int d3 = getDistance(trigPin1, echoPin3);
   int d4 = getDistance(trigPin1, echoPin4);
-
-  // Imprime las distancias en centímetros
-  Serial.print("[");
-  Serial.print(d1);
-  Serial.print(",");
-  Serial.print(d2);
-  Serial.print(",");
-  Serial.print(d3);
-  Serial.print(",");
-  Serial.print(d4);
-  Serial.println("]");
-  delay(1000); // Espera 1 segundo antes de la siguiente lectura
 
 
   if(d1==0)
@@ -57,7 +59,6 @@ void loop() {
         if(d4==0)
         { //1
         Serial.print("caso 1");
-          
         }
         else
         { //2
@@ -118,6 +119,8 @@ void loop() {
   }
 }
 
+/*------------ Funciones-------*/
+
 // Función para obtener la distancia
 int getDistance(int trigPin, int echoPin) {
   digitalWrite(trigPin, LOW);
@@ -130,8 +133,31 @@ int getDistance(int trigPin, int echoPin) {
   float cm = duration / 58.0; // Conversión a centímetros
   if(cm>40) return 0;
   if(cm>0) return 1;
-  
+  }
+
+// Función para imprimir distancias en cm [d1,d2,d3,d4]
+void printing(int d1, int d2, int d3, intd4){
+  Serial.print("[");
+  Serial.print(d1);
+  Serial.print(",");
+  Serial.print(d2);
+  Serial.print(",");
+  Serial.print(d3);
+  Serial.print(",");
+  Serial.print(d4);
+  Serial.println("]");
+  }
+
+// Función para controlar cada motor: Recibe el valor del pwm y del dir.
+// Con la variable 'motor' identificamos si es el motor derecho (motor=1) o izquierdo (motor=0) 
+
+void driverMotor(int pwm, int dir, int motor){
+  if motor{    //motor=1, es decir motor derecho
+    analogWrite(PWMR, pwm);
+    digitalWrite(RDIR, dir);
+  }else{      //motor=0, es decir motor izquierdo
+    analogWrite(PWML, pwm);
+    digitalWrite(LDIR, dir);
+  }
 }
-
-
 
