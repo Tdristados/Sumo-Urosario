@@ -6,14 +6,14 @@
    - GND: GND
 */
 
-#define trigPin1 2; // Disparador (Trigger) para el primer sensor
-#define echoPin1 6; // Eco (Echo) para el primer sensor
-#define echoPin2 7; // Eco (Echo) para el segundo sensor
-#define echoPin3 8; // Eco (Echo) para el tercer sensor
-#define echoPin4 9; // Eco (Echo) para el tercer sensor
+const int trigPin1 = 2; // Disparador (Trigger) para el primer sensor
+const int echoPin1 = 6; // Eco (Echo) para el primer sensor
+const int echoPin2 = 7; // Eco (Echo) para el segundo sensor
+const int echoPin3 = 8; // Eco (Echo) para el tercer sensor
+const int echoPin4 = 9; // Eco (Echo) para el tercer sensor
 
-#define SLL 12; // Sensor de Linea izquierdo
-#define SLD 11; // Sensor de Linea derecho
+const int SLL = 12; // Sensor de Linea izquierdo
+const int SLR = 11; // Sensor de Linea derecho
 
 #define PWML 10  // Potencia del motor izquierdo (valores entre 0-255)
 #define LDIR 5  // Direccionamiento del motor izquierdo 
@@ -33,8 +33,8 @@ void setup() {
   pinMode(echoPin3, INPUT);
   pinMode(echoPin4, INPUT);
 
-  pinMode(SLL, OUTPUT);
-  pinMode(SLR, OUTPUT);
+  pinMode(SLL, INPUT);
+  pinMode(SLR, INPUT);
 
   pinMode(PWML, OUTPUT);
   pinMode(PWMR, OUTPUT);
@@ -48,6 +48,9 @@ void loop() {
   int d2 = getDistance(trigPin1, echoPin2);
   int d3 = getDistance(trigPin1, echoPin3);
   int d4 = getDistance(trigPin1, echoPin4);
+  
+  int sensorValue1 = digitalRead(SLL);
+  int sensorValue2 = digitalRead(SLR);
 
 
   if(d1==0)
@@ -136,7 +139,7 @@ int getDistance(int trigPin, int echoPin) {
   }
 
 // Función para imprimir distancias en cm [d1,d2,d3,d4]
-void printing(int d1, int d2, int d3, intd4){
+void printing(int d1, int d2, int d3, int d4){
   Serial.print("[");
   Serial.print(d1);
   Serial.print(",");
@@ -152,7 +155,7 @@ void printing(int d1, int d2, int d3, intd4){
 // Con la variable 'motor' identificamos si es el motor derecho (motor=1) o izquierdo (motor=0) 
 
 void driverMotor(int pwm, int dir, int motor){
-  if motor{    //motor=1, es decir motor derecho
+  if (motor){    //motor=1, es decir motor derecho
     analogWrite(PWMR, pwm);
     digitalWrite(RDIR, dir);
   }else{      //motor=0, es decir motor izquierdo
